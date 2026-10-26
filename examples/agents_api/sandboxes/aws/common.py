@@ -153,7 +153,9 @@ async def delete_session(client, session_id):
         except APIStatusError as error:
             if error.status_code != 409 or attempt == 9:
                 raise
-            await client.beta.agents.sessions.cancel(session_id)
+            await client.beta.agents.sessions.events.create(
+                session_id, events=[{"type": "agent.session.input.cancel"}]
+            )
             await asyncio.sleep(2)
     try:
         await client.beta.agents.sessions.retrieve(session_id)
